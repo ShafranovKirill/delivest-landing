@@ -1,0 +1,64 @@
+---
+const steps = [
+  ['Демонстрация', 'Показываем сайт и панель, обсуждаем филиалы и акции.'],
+  ['Развёртывание', 'Ваш домен, SSL-сертификат, название и фирменный цвет.'],
+  ['Наполнение', 'Меню загружается таблицей из Excel вместе с фото.'],
+  ['Интеграции', 'CRM, вход по звонку, карты, юридические документы.'],
+  ['Запуск', 'Обучаем персонал и остаёмся на связи.'],
+];
+const ops = [
+  ['Отдельная база', 'У каждого заведения своя установка и данные.'],
+  ['Бэкапы', 'Каждый день, хранятся последние 7 копий.'],
+  ['Мониторинг', 'Сервер, сайт и доставка заказов в CRM.'],
+  ['Обновления', 'Новые функции ставим удалённо.'],
+];
+---
+<section class="tinted">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker">Подключение</span>
+      <h2>Как <em>запускаемся</em></h2>
+      <p>Техническую часть делаем мы. От заведения нужны меню, фотографии и доступ к CRM.</p>
+    </div>
+    <ol class="steps" data-progress>
+      {steps.map(([t, p], i) => <li class="reveal" style={`--d:${i}`}><h3>{t}</h3><p>{p}</p></li>)}
+    </ol>
+    <div class="ops">
+      {ops.map(([t, p], i) => <div class="reveal" style={`--d:${i}`}><b>{t}</b><span>{p}</span></div>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+  .steps::before, .steps::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line); }
+  .steps::after { background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 1.6s var(--ease) .2s; }
+  .steps.go::after { transform: none; }
+  .steps li { counter-increment: s; padding: 28px 20px 0 0; position: relative; }
+  .steps li::before { content: "0" counter(s); display: block; font-family: "Lora", serif; font-style: italic; font-size: 30px; color: var(--accent); margin-bottom: 6px; }
+  .steps li::after { content: ""; position: absolute; left: 0; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper-2); border: 2px solid var(--accent); }
+  .steps p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  .ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: clamp(40px, 6vw, 56px); }
+  .ops div { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; }
+  .ops b { display: block; font-size: 16px; }
+  .ops span { color: var(--muted); font-size: 14.5px; }
+
+  @media (max-width: 1020px) {
+    .steps { grid-template-columns: 1fr; padding-left: 28px; }
+    .steps::before, .steps::after { left: 5px; right: auto; top: 6px; bottom: 6px; width: 2px; height: auto; }
+    .steps::after { transform: scaleY(0); transform-origin: top; }
+    .steps li { padding: 0 0 24px; }
+    .steps li::before { font-size: 24px; display: inline; margin-right: 10px; }
+    .steps li h3 { display: inline; }
+    .steps li p { margin-top: 4px; }
+    .steps li::after { left: -28px; top: 8px; }
+    .ops { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('[data-progress]').forEach(el => new IntersectionObserver(([e], io) => {
+    if (e.isIntersecting) { el.classList.add('go'); io.disconnect(); }
+  }, { threshold: .5 }).observe(el));
+</script>

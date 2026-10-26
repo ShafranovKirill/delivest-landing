@@ -1,0 +1,126 @@
+---
+import Shot from './Shot.astro';
+
+const steps = [
+  { name: 'client-menu', title: 'Витрина', text: 'Баннеры акций на первом экране, меню по категориям, зачёркнутые цены со скидкой.' },
+  { name: 'client-product', title: 'Карточка', text: 'Фото, вес, состав и кнопка «В корзину» с ценой.' },
+  { name: 'client-cart', title: 'Корзина', text: 'Промокод, итог со скидкой и подсказка, сколько осталось до акции.' },
+  { name: 'client-checkout', title: 'Оформление', text: 'Доставка, самовывоз или в зале, ко времени, наличные или карта. Регистрация не нужна.' },
+  { name: 'client-auth', title: 'Вход по звонку', text: 'Номер подтверждается бесплатным звонком. Пароль и СМС не нужны, заведение не платит за коды.' },
+  { name: 'client-promos', title: 'Акции', text: 'Все акции заведения на одной странице, с переходом к товару.' },
+  { name: 'client-branch', title: 'Страница заведения', text: 'Адрес на Яндекс Картах, режим работы, телефон и соцсети.' },
+];
+const extras = [
+  ['Гостевой заказ', 'Хватит имени и телефона'],
+  ['Предзаказ', 'На сегодня или завтра, даже когда закрыто'],
+  ['Статусы онлайн', 'Принят, готовится, в пути, выполнен'],
+  ['Адреса и история', 'Подставляются при следующем заказе'],
+  ['Подарки', 'Добавляются в корзину сами'],
+  ['Две темы, два языка', 'Светлая и тёмная, русский и английский'],
+  ['Документы', 'Оферта, политика и согласие на ПДн из ваших реквизитов'],
+  ['Любой экран', 'Телефон, планшет, компьютер'],
+];
+---
+<section id="app">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker">Клиентское приложение</span>
+      <h2>Заказ <em>в несколько касаний</em></h2>
+      <p>Гость открывает сайт с телефона или компьютера. Ваше название, фирменный цвет, ваше меню и акции.</p>
+    </div>
+
+    <div class="tour" data-tour>
+      <ol class="steps reveal">
+        {steps.map((s, i) => (
+          <li>
+            <button type="button" class:list={[i === 0 && 'on']} aria-pressed={i === 0 ? 'true' : 'false'}>
+              <span class="n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="t"><b>{s.title}</b><span class="d"><span>{s.text}</span></span></span>
+              <span class="bar"></span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div class="device reveal" style="--d:2">
+        <div class="phone">
+          <div class="screens">
+            {steps.map((s, i) => (
+              <div class:list={['scr', i === 0 && 'on']}><Shot name={s.name} alt={s.title} widths={[300, 585]} sizes="(max-width: 720px) 70vw, 300px" /></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="extras">
+      {extras.map(([b, t], i) => <li class="reveal" style={`--d:${i % 4}`}><b>{b}</b><span>{t}</span></li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tour { display: grid; grid-template-columns: 1fr minmax(260px, 320px); gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .steps li { border-bottom: 1px solid var(--line); }
+  .steps button {
+    position: relative; width: 100%; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: baseline;
+    padding: 14px 0; background: none; border: 0; text-align: left; cursor: pointer;
+  }
+  .n { font-family: "Lora", serif; font-style: italic; font-size: 20px; color: var(--muted); transition: color .3s; }
+  .t b { display: block; font-size: 18px; font-weight: 600; color: var(--ink-2); transition: color .3s; }
+  .d { display: grid; grid-template-rows: 0fr; color: var(--muted); font-size: 15.5px; transition: grid-template-rows .45s var(--ease), margin .45s var(--ease); }
+  .d > span { min-height: 0; overflow: hidden; }
+  .on .n { color: var(--accent); }
+  .on .t b, .steps button:hover .t b { color: var(--ink); }
+  .on .d { grid-template-rows: 1fr; margin-top: 4px; }
+  .bar { position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+  .on .bar { animation: fill var(--step, 4.5s) linear forwards; }
+  [data-tour].paused .on .bar { animation-play-state: paused; }
+  @keyframes fill { to { transform: none; } }
+
+  .device { max-width: 320px; width: 100%; margin: 0 auto; }
+
+  .extras { list-style: none; padding: 0; margin: clamp(48px, 7vw, 80px) 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .extras li { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; transition: border-color .2s, transform .2s var(--ease); }
+  .extras li:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .extras b { display: block; font-size: 16px; margin-bottom: 2px; }
+  .extras span { color: var(--muted); font-size: 14.5px; line-height: 1.45; }
+
+  @media (max-width: 1020px) { .extras { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) {
+    .tour { grid-template-columns: 1fr; }
+    .device { order: -1; max-width: 250px; }
+    .extras { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .extras li { padding: 14px 16px; }
+  }
+</style>
+
+<script>
+  // Step list drives the phone: auto-advances while on screen, a click picks a step and keeps going from it
+  const STEP = 4500;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-tour]').forEach(tour => {
+    const buttons = [...tour.querySelectorAll('button')];
+    const screens = [...tour.querySelectorAll('.scr')];
+    tour.style.setProperty('--step', `${STEP}ms`);
+    let i = 0, timer = 0, visible = false, hover = false;
+    const show = (n: number) => {
+      buttons[i].classList.remove('on'); buttons[i].setAttribute('aria-pressed', 'false'); screens[i].classList.remove('on');
+      i = n;
+      buttons[i].classList.add('on'); buttons[i].setAttribute('aria-pressed', 'true'); screens[i].classList.add('on');
+    };
+    const schedule = () => {
+      clearTimeout(timer);
+      const run = visible && !hover && !calm && !document.hidden;
+      tour.classList.toggle('paused', !run);
+      if (run) timer = setTimeout(() => { show((i + 1) % buttons.length); schedule(); }, STEP);
+    };
+    // Restart the progress bar animation on the newly active step
+    const restartBar = () => { const bar = buttons[i].querySelector<HTMLElement>('.bar')!; bar.style.animation = 'none'; bar.offsetWidth; bar.style.animation = ''; };
+    buttons.forEach((b, n) => b.addEventListener('click', () => { show(n); restartBar(); schedule(); }));
+    tour.addEventListener('pointerenter', () => { hover = true; schedule(); });
+    tour.addEventListener('pointerleave', () => { hover = false; restartBar(); schedule(); });
+    document.addEventListener('visibilitychange', schedule);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: .35 }).observe(tour);
+  });
+</script>

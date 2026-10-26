@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+
+const title = 'Delivest: собственная доставка для кафе и ресторанов';
+const description = 'Платформа онлайн-заказов для кафе и ресторанов: клиентское веб-приложение под вашим брендом, панель управления, конструктор акций и интеграция с CRM.';
+const site = 'https://delivest.shafranov.tech';
+---
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content={`${site}/brand/og-image.png`}>
+  <meta property="og:url" content={site}>
+  <meta name="theme-color" content="#F7F2F1">
+  <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+  <script is:inline>
+    try { if (localStorage.getItem('theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Lora:ital,wght@1,500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <slot />
+  <script>
+    const root = document.documentElement;
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!;
+    const syncMeta = () => { meta.content = getComputedStyle(root).getPropertyValue('--paper').trim(); };
+    syncMeta();
+
+    document.querySelectorAll('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
+      const apply = () => {
+        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+        syncMeta();
+      };
+      const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (document.startViewTransition && !calm) document.startViewTransition(apply); else apply();
+    }));
+
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
