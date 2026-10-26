@@ -74,9 +74,6 @@ const extras = [
   .on .t b, .steps button:hover .t b { color: var(--ink); }
   .on .d { grid-template-rows: 1fr; margin-top: 4px; }
   .bar { position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
-  .on .bar { animation: fill var(--step, 4.5s) linear forwards; }
-  [data-tour].paused .on .bar { animation-play-state: paused; }
-  @keyframes fill { to { transform: none; } }
 
   .device { max-width: 320px; width: 100%; margin: 0 auto; }
 
@@ -96,31 +93,39 @@ const extras = [
 </style>
 
 <script>
-  // Step list drives the phone: auto-advances while on screen, a click picks a step and keeps going from it
+  // Step list drives the phone. The countdown runs only while the block is in the middle of the screen;
+  // scrolling away pauses it and coming back resumes from the same point. A click picks a step and starts it over.
   const STEP = 4500;
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll<HTMLElement>('[data-tour]').forEach(tour => {
     const buttons = [...tour.querySelectorAll('button')];
     const screens = [...tour.querySelectorAll('.scr')];
-    tour.style.setProperty('--step', `${STEP}ms`);
-    let i = 0, timer = 0, visible = false, hover = false;
+    const bars = buttons.map(b => b.querySelector<HTMLElement>('.bar')!);
+    let i = 0, elapsed = 0, last = 0, visible = false, frame = 0;
+
     const show = (n: number) => {
+      bars[i].style.transform = '';
       buttons[i].classList.remove('on'); buttons[i].setAttribute('aria-pressed', 'false'); screens[i].classList.remove('on');
-      i = n;
+      i = n; elapsed = 0;
       buttons[i].classList.add('on'); buttons[i].setAttribute('aria-pressed', 'true'); screens[i].classList.add('on');
     };
-    const schedule = () => {
-      clearTimeout(timer);
-      const run = visible && !hover && !calm && !document.hidden;
-      tour.classList.toggle('paused', !run);
-      if (run) timer = setTimeout(() => { show((i + 1) % buttons.length); schedule(); }, STEP);
+    const tick = (now: number) => {
+      elapsed += now - last;
+      last = now;
+      if (elapsed >= STEP) show((i + 1) % buttons.length);
+      bars[i].style.transform = `scaleX(${elapsed / STEP})`;
+      frame = requestAnimationFrame(tick);
     };
-    // Restart the progress bar animation on the newly active step
-    const restartBar = () => { const bar = buttons[i].querySelector<HTMLElement>('.bar')!; bar.style.animation = 'none'; bar.offsetWidth; bar.style.animation = ''; };
-    buttons.forEach((b, n) => b.addEventListener('click', () => { show(n); restartBar(); schedule(); }));
-    tour.addEventListener('pointerenter', () => { hover = true; schedule(); });
-    tour.addEventListener('pointerleave', () => { hover = false; restartBar(); schedule(); });
-    document.addEventListener('visibilitychange', schedule);
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: .35 }).observe(tour);
+    const sync = () => {
+      cancelAnimationFrame(frame);
+      if (visible && !calm && !document.hidden) {
+        last = performance.now();
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    buttons.forEach((b, n) => b.addEventListener('click', () => { show(n); sync(); }));
+    document.addEventListener('visibilitychange', sync);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }, { rootMargin: '-30% 0px -30% 0px' }).observe(tour);
   });
 </script>

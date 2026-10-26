@@ -1,16 +1,16 @@
 ---
 const steps = [
-  ['Демонстрация', 'Показываем сайт и панель, обсуждаем филиалы и акции.'],
-  ['Развёртывание', 'Ваш домен, SSL-сертификат, название и фирменный цвет.'],
-  ['Наполнение', 'Меню загружается таблицей из Excel вместе с фото.'],
-  ['Интеграции', 'CRM, вход по звонку, карты, юридические документы.'],
-  ['Запуск', 'Обучаем персонал и остаёмся на связи.'],
+  ['Демонстрация и обсуждение', 'Показываем сайт и панель управления, обсуждаем ваше заведение, филиалы и акции.'],
+  ['Домен и дизайн', 'Арендуем домен специально для вас и подбираем индивидуальный дизайн под ваш бренд.'],
+  ['Товары и филиалы', 'Переносим ваше меню с фотографиями и всю информацию о филиалах.'],
+  ['Интеграции', 'Подключаем вашу CRM, вход по звонку, карты и юридические документы.'],
+  ['Запуск', 'Обучаем персонал, и сайт начинает принимать заказы.'],
 ];
-const ops = [
-  ['Отдельная база', 'У каждого заведения своя установка и данные.'],
-  ['Бэкапы', 'Каждый день, хранятся последние 7 копий.'],
-  ['Мониторинг', 'Сервер, сайт и доставка заказов в CRM.'],
-  ['Обновления', 'Новые функции ставим удалённо.'],
+const care = [
+  ['Следим 24/7', 'Каждая ошибка на сайте видна нам сразу, круглосуточно. Реагируем раньше, чем её заметят гости.'],
+  ['Заказы не теряются', 'Если ваша CRM временно недоступна, заказ дождётся и уйдёт на кухню, как только она заработает.'],
+  ['Всегда на связи', 'Ответим и поможем в Telegram или по телефону: поменять меню, запустить акцию, разобраться с заказом.'],
+  ['Сайт развивается', 'Новые возможности появляются у вас сами, ничего делать не нужно.'],
 ];
 ---
 <section class="tinted">
@@ -18,13 +18,17 @@ const ops = [
     <div class="head reveal">
       <span class="kicker">Подключение</span>
       <h2>Как <em>запускаемся</em></h2>
-      <p>Техническую часть делаем мы. От заведения нужны меню, фотографии и доступ к CRM.</p>
+      <p>Всё берём на себя. От вас нужны только меню, фотографии и доступ к CRM.</p>
     </div>
     <ol class="steps" data-progress>
       {steps.map(([t, p], i) => <li class="reveal" style={`--d:${i}`}><h3>{t}</h3><p>{p}</p></li>)}
     </ol>
-    <div class="ops">
-      {ops.map(([t, p], i) => <div class="reveal" style={`--d:${i}`}><b>{t}</b><span>{p}</span></div>)}
+    <div class="care">
+      {care.map(([t, p], i) => (
+        <div class:list={['reveal', i === 0 && 'main']} style={`--d:${i}`}>
+          <b>{i === 0 && <i class="live"></i>}{t}</b><span>{p}</span>
+        </div>
+      ))}
     </div>
   </div>
 </section>
@@ -39,10 +43,16 @@ const ops = [
   .steps li::after { content: ""; position: absolute; left: 0; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper-2); border: 2px solid var(--accent); }
   .steps p { margin: 0; color: var(--ink-2); font-size: 15px; }
 
-  .ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: clamp(40px, 6vw, 56px); }
-  .ops div { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; }
-  .ops b { display: block; font-size: 16px; }
-  .ops span { color: var(--muted); font-size: 14.5px; }
+  .care { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: clamp(48px, 7vw, 72px); }
+  .care div { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .care b { display: flex; align-items: center; gap: 10px; font-size: 18px; letter-spacing: -.01em; margin-bottom: 6px; }
+  .care span { color: var(--ink-2); font-size: 15px; line-height: 1.5; }
+  .care .main { background: var(--brand); border-color: var(--brand); color: var(--on-night); }
+  .care .main b { font-size: 22px; }
+  .care .main span { color: var(--night-text); }
+  .live { width: 9px; height: 9px; border-radius: 50%; background: #4CC383; position: relative; flex: none; }
+  .live::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #4CC383; animation: ping 2s ease-out infinite; }
+  @keyframes ping { to { transform: scale(3); opacity: 0; } }
 
   @media (max-width: 1020px) {
     .steps { grid-template-columns: 1fr; padding-left: 28px; }
@@ -53,8 +63,9 @@ const ops = [
     .steps li h3 { display: inline; }
     .steps li p { margin-top: 4px; }
     .steps li::after { left: -28px; top: 8px; }
-    .ops { grid-template-columns: 1fr 1fr; }
+    .care { grid-template-columns: 1fr 1fr; }
   }
+  @media (max-width: 720px) { .care { grid-template-columns: 1fr; } }
 </style>
 
 <script>
