@@ -14,7 +14,8 @@ DOMAIN=$(env_value DOMAIN | sed -E -e 's#^[a-z]+://##' -e 's#[/:].*$##')
 EMAIL=$(env_value LETSENCRYPT_EMAIL)
 [ -n "$DOMAIN" ] || { echo "DOMAIN is empty, check .env" >&2; exit 1; }
 
-ROOT=/var/www/$DOMAIN
+PORT=$(env_value LANDING_PORT)
+PORT=${PORT:-8090}
 CERT_DIR=/etc/letsencrypt/live/$DOMAIN
 
 if [ -d /etc/nginx/sites-available ]; then
@@ -25,30 +26,27 @@ else
   LINK=
 fi
 
-mkdir -p "$ROOT"
-rm -rf "$ROOT.new"
-mkdir "$ROOT.new"
-cp -R index.html screens "$ROOT.new/"
-rm -rf "$ROOT.old"
-mv "$ROOT" "$ROOT.old"
-mv "$ROOT.new" "$ROOT"
-rm -rf "$ROOT.old"
+docker compose version >/dev/null 2>&1 || { echo "docker compose not found: curl -fsSL https://get.docker.com | sh" >&2; exit 1; }
+
+# The container builds the site and serves it on 127.0.0.1:$PORT; host nginx terminates TLS in front of it
+LANDING_PORT=$PORT docker compose up -d --build --remove-orphans
+docker image prune -f >/dev/null
+
+i=0
+until curl -fsS -o /dev/null "http://127.0.0.1:$PORT/"; do
+  i=$((i + 1))
+  [ "$i" -lt 20 ] || { echo "container does not answer on 127.0.0.1:$PORT" >&2; docker compose logs --tail 50 >&2; exit 1; }
+  sleep 1
+done
 
 site_body() {
   cat <<CONF
-    root $ROOT;
-    index index.html;
-
-    gzip on;
-    gzip_types text/css application/javascript image/svg+xml;
-
     location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-
-    location /screens/ {
-        expires 30d;
-        add_header Cache-Control "public";
+        proxy_pass http://127.0.0.1:$PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 CONF
 }
@@ -131,4 +129,4 @@ fi
 write_https_conf "$TMP"
 install_conf "$TMP"
 
-echo "Done: https://$DOMAIN -> $ROOT"
+echo "Done: https://$DOMAIN -> 127.0.0.1:$PORT"

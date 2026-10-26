@@ -1,0 +1,8 @@
+services:
+  landing:
+    build: .
+    image: delivest-landing:latest
+    container_name: delivest_landing
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${LANDING_PORT:-8090}:80"
