@@ -33,4 +33,6 @@ sudo ./deploy.sh
 
 The script builds the image and starts the container, waits for it to answer, writes the host nginx config for `DOMAIN`, issues a Let's Encrypt certificate and redirects HTTP to HTTPS. To update: `git pull && sudo ./deploy.sh`.
 
+Contact form: the page posts to `/api/lead`, the `lead` container (`lead/server.mjs`) forwards the request to Telegram. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `.env`; without them the form shows an error with the Telegram and phone contacts.
+
 Without the script: `docker compose up -d --build` serves the site on `http://127.0.0.1:8090`.

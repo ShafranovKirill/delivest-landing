@@ -8,7 +8,10 @@ const demo = 'https://delivest-client.shafranov.tech';
         <span class="kicker">Демо и контакты</span>
         <h2>Попробуйте <em>сами</em></h2>
         <p>Соберите корзину на демо-сайте, примените промокод и оформите тестовый заказ. Панель управления покажем по запросу: увидите, как персонал обрабатывает этот заказ.</p>
-        <a class="demo-url" href={demo} target="_blank" rel="noopener">delivest-client.shafranov.tech <span>↗</span></a>
+        <div class="actions">
+          <button class="btn lead-btn" type="button" data-lead>Оставить заявку</button>
+          <a class="demo-url" href={demo} target="_blank" rel="noopener">delivest-client.shafranov.tech <span>↗</span></a>
+        </div>
       </div>
       <div class="reach">
         <a class="phone-num" href="tel:+79255355278">+7 925 535-52-78</a>
@@ -50,6 +53,9 @@ const demo = 'https://delivest-client.shafranov.tech';
   h2 em { color: var(--gold); }
   p { margin: 0 0 24px; font-size: 17.5px; color: var(--night-text); }
 
+  .actions { display: grid; gap: 12px; }
+  .lead-btn { background: var(--gold); border-color: var(--gold); color: #2A0007; min-height: 54px; font-size: 17px; }
+  .lead-btn:hover { background: var(--on-night); border-color: var(--on-night); }
   .demo-url { display: flex; justify-content: space-between; gap: 12px; font-family: "JetBrains Mono", monospace; font-size: clamp(13px, 1.4vw, 16px); background: var(--on-night); color: #2A0007; border-radius: 14px; padding: 16px 20px; text-decoration: none; border: 1.5px solid var(--on-night); transition: background .2s, color .2s; overflow: hidden; }
   .demo-url span { transition: transform .2s var(--ease); }
   .demo-url:hover { background: transparent; color: var(--on-night); }
