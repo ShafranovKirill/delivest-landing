@@ -7,21 +7,22 @@
   </button>
 
   <form class="form" novalidate>
-    <h2 id="lead-title">Оставить <em>заявку</em></h2>
-    <p class="sub">Оставьте телефон или почту, и мы свяжемся с вами в рабочее время.</p>
+    <h2 id="lead-title">Delivest <em>в деле</em></h2>
+    <p class="sub">Покажем сайт гостя и управление доставкой. Оставьте контакт — договоримся о демонстрации.</p>
 
     <label class="field">
       <span>Телефон или почта</span>
-      <input name="contact" type="text" inputmode="email" autocomplete="tel" required maxlength="120" placeholder="+7 900 000-00-00 или почта">
+      <input name="contact" type="text" autocomplete="email" required maxlength="120" placeholder="+7 900 000-00-00 или почта">
     </label>
     <label class="field">
       <span>Имя <small>по желанию</small></span>
       <input name="name" type="text" autocomplete="name" maxlength="80" placeholder="Как к вам обращаться">
     </label>
+    <input name="intent" type="hidden" value="demo">
     <label class="trap" aria-hidden="true">Сайт <input name="website" type="text" tabindex="-1" autocomplete="off"></label>
 
     <p class="error" role="alert" hidden></p>
-    <button class="btn btn-ink submit" type="submit">Отправить заявку</button>
+    <button class="btn btn-ink submit" type="submit">Записаться на демо</button>
     <p class="fine">Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи с вами.</p>
   </form>
 
@@ -48,7 +49,7 @@
   @starting-style { .lead[open]::backdrop { background: rgb(20 4 8 / 0); backdrop-filter: blur(0); } }
 
   .form, .done { padding: clamp(28px, 5vw, 40px); }
-  h2 { font-size: clamp(28px, 4vw, 36px); margin: 0 0 8px; }
+  h2 { font-size: clamp(28px, 4vw, 36px); margin: 0 0 8px; padding-right: 20px; overflow-wrap: anywhere; }
   .sub { margin: 0 0 24px; color: var(--ink-2); font-size: 16px; }
   .close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 0; background: transparent; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
   .close:hover { background: var(--paper-2); color: var(--ink); }
@@ -94,16 +95,37 @@
   const fail = (html: string) => { error.innerHTML = html; error.hidden = false; };
   const tg = '<a href="https://t.me/shafranov_ex" target="_blank" rel="noopener">@shafranov_ex</a>';
 
-  const open = () => {
+  const title = dialog.querySelector<HTMLElement>('#lead-title')!;
+  const intro = form.querySelector<HTMLElement>('.sub')!;
+  const intent = form.elements.namedItem('intent') as HTMLInputElement;
+  const requestCopy = {
+    demo: { title: 'Delivest', emphasis: 'в деле', intro: 'Покажем сайт гостя и управление доставкой. Оставьте контакт — договоримся о демонстрации.', button: 'Записаться на демо' },
+    pricing: { title: 'Рассчитаем', emphasis: 'подключение', intro: 'Обсудим ваши точки и сервисы, состав подключения и стоимость. Оставьте контакт — свяжемся с вами в рабочее время.', button: 'Получить расчёт' },
+  };
+  let selected: keyof typeof requestCopy = 'demo';
+  const open = (kind: string | undefined) => {
     if (!done.hidden) { form.reset(); form.hidden = false; done.hidden = true; }
+    selected = kind === 'pricing' ? 'pricing' : 'demo';
+    const copy = requestCopy[selected];
+    const emphasis = document.createElement('em');
+    emphasis.textContent = copy.emphasis;
+    title.replaceChildren(`${copy.title} `, emphasis);
+    intro.textContent = copy.intro;
+    submit.textContent = copy.button;
+    intent.value = selected;
     error.hidden = true;
     contact.removeAttribute('aria-invalid');
     dialog.showModal();
+    document.body.style.overflow = 'hidden';
   };
-  document.querySelectorAll('[data-lead]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); open(); }));
+  document.querySelectorAll<HTMLElement>('[data-lead]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); open(el.dataset.lead); }));
   dialog.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => dialog.close()));
+  dialog.addEventListener('close', () => { document.body.style.overflow = ''; });
   // Click on the backdrop closes the dialog
-  dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
+  dialog.addEventListener('click', e => {
+    const r = dialog.getBoundingClientRect();
+    if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
+  });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -127,7 +149,7 @@
       fail(`Не получилось отправить. Напишите нам в Telegram ${tg} или позвоните +7 925 535-52-78.`);
     } finally {
       submit.disabled = false;
-      submit.textContent = 'Отправить заявку';
+      submit.textContent = requestCopy[selected].button;
     }
   });
 </script>
