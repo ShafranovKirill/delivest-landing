@@ -59,6 +59,7 @@ http.createServer(async (req, res) => {
 
   const contact = clean(data.contact, 120);
   const name = clean(data.name, 80);
+  const intent = data.intent === 'pricing' ? 'Расчёт подключения' : 'Демонстрация Delivest';
   if (contact.length < 5) return send(res, 400, { ok: false, error: 'contact' });
 
   const ip = String(req.headers['x-real-ip'] || req.socket.remoteAddress || '');
@@ -68,6 +69,7 @@ http.createServer(async (req, res) => {
   const time = new Date().toLocaleString('ru-RU', { timeZone: TZ, dateStyle: 'short', timeStyle: 'short' });
   const text = [
     '<b>Новая заявка с лендинга</b>',
+    `Запрос: ${intent}`,
     `Контакт: ${escape(contact)}`,
     `Имя: ${name ? escape(name) : '—'}`,
     `Время: ${time}`,

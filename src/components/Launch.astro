@@ -1,28 +1,30 @@
 ---
 const steps = [
-  ['Демонстрация и обсуждение', 'Показываем сайт и панель управления, обсуждаем ваше заведение, филиалы и акции.'],
-  ['Домен и дизайн', 'Арендуем домен специально для вас и подбираем индивидуальный дизайн под ваш бренд.'],
-  ['Товары и филиалы', 'Переносим ваше меню с фотографиями и всю информацию о филиалах.'],
-  ['Интеграции', 'Подключаем вашу CRM, вход по звонку, карты и юридические документы.'],
-  ['Запуск', 'Обучаем персонал, и сайт начинает принимать заказы.'],
+  ['Разбираем вашу задачу', 'Показываем Delivest, обсуждаем точки и сервисы. Согласуем состав подключения, стоимость и этапы запуска.'],
+  ['Готовим ваш сайт', 'Настраиваем домен и оформление, переносим меню и данные филиалов, подключаем согласованные интеграции.'],
+  ['Проверяем и запускаем', 'Проходим путь заказа вместе с вами, обучаем команду и запускаем приём заказов. После запуска остаёмся на связи.'],
 ];
 const care = [
-  ['Следим 24/7', 'Каждая ошибка на сайте видна нам сразу, круглосуточно. Реагируем раньше, чем её заметят гости.'],
-  ['Заказы не теряются', 'Если ваша CRM временно недоступна, заказ дождётся и уйдёт на кухню, как только она заработает.'],
-  ['Всегда на связи', 'Ответим и поможем в Telegram или по телефону: поменять меню, запустить акцию, разобраться с заказом.'],
-  ['Сайт развивается', 'Новые возможности появляются у вас сами, ничего делать не нужно.'],
+  ['Следим 24/7', 'Мониторинг помогает замечать технические сбои и разбираться с ними.'],
+  ['Передача заказов', 'При временной недоступности ресторанной системы предусмотрена повторная отправка заказа.'],
+  ['Помощь после запуска', 'Поможем в Telegram или по телефону: поменять меню, запустить акцию, разобраться с заказом.'],
+  ['Развитие продукта', 'Обновления Delivest появляются на вашем сайте без самостоятельной установки.'],
 ];
 ---
-<section class="tinted">
+<section id="launch" class="tinted">
   <div class="wrap">
     <div class="head reveal">
       <span class="kicker">Подключение</span>
-      <h2>Как <em>запускаемся</em></h2>
-      <p>Всё берём на себя. От вас нужны только меню, фотографии и доступ к CRM.</p>
+      <h2>Запускаем вместе.<br/><em>По понятным шагам.</em></h2>
+      <p>Вам не нужно собирать сайт, бонусную программу и рабочие экраны по отдельности. Поможем подготовить систему к работе вашего заведения.</p>
     </div>
     <ol class="steps" data-progress>
       {steps.map(([t, p], i) => <li class="reveal" style={`--d:${i}`}><h3>{t}</h3><p>{p}</p></li>)}
     </ol>
+    <div class="launch-action">
+      <div><h3>Сколько стоит ваш запуск?</h3><p>Стоимость зависит от количества точек, интеграций и объёма подготовки. Обсудим, что входит в подключение и какие сторонние сервисы оплачиваются отдельно.</p></div>
+      <button class="btn btn-ink" type="button" data-lead="pricing">Рассчитать подключение</button>
+    </div>
     <div class="care">
       {care.map(([t, p], i) => (
         <div class:list={['reveal', i === 0 && 'main']} style={`--d:${i}`}>
@@ -34,7 +36,7 @@ const care = [
 </section>
 
 <style>
-  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); position: relative; }
   .steps::before, .steps::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line); }
   .steps::after { background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 1.6s var(--ease) .2s; }
   .steps.go::after { transform: none; }
@@ -43,6 +45,9 @@ const care = [
   .steps li::after { content: ""; position: absolute; left: 0; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper-2); border: 2px solid var(--accent); }
   .steps p { margin: 0; color: var(--ink-2); font-size: 15px; }
 
+  .launch-action { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 36px; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); }
+  .launch-action p { max-width: 620px; margin: 8px 0 0; color: var(--ink-2); font-size: 15px; }
+  .launch-action .btn { flex: none; }
   .care { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: clamp(48px, 7vw, 72px); }
   .care div { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
   .care b { display: flex; align-items: center; gap: 10px; font-size: 18px; letter-spacing: -.01em; margin-bottom: 6px; }
@@ -65,7 +70,7 @@ const care = [
     .steps li::after { left: -28px; top: 8px; }
     .care { grid-template-columns: 1fr 1fr; }
   }
-  @media (max-width: 720px) { .care { grid-template-columns: 1fr; } }
+  @media (max-width: 720px) { .launch-action { flex-direction: column; align-items: stretch; padding: 24px; } .care { grid-template-columns: 1fr; } }
 </style>
 
 <script>
